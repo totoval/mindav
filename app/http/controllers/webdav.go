@@ -15,10 +15,11 @@ type WebDAV struct {
 func (wd *WebDAV) Handle (c *gin.Context){
 	uri := "/v1" + config.GetString("webdav.base_url")
 
+	username := "toby"
 
 	h := webdav.Handler{
 		Prefix: uri,
-		FileSystem: _webdav.FileSystem(),
+		FileSystem: _webdav.FileSystem(username),
 		LockSystem: webdav.NewMemLS(),
 	}
 
