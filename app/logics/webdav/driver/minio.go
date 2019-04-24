@@ -1,6 +1,7 @@
 package driver
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"github.com/minio/minio-go"
@@ -73,19 +74,11 @@ func (m Minio) MkBucket() (err error) {
 
 func (m Minio)Mkdir(ctx context.Context, name string, perm os.FileMode) error {
 	const KEEP_FILE_NAME = ".keep"
-	object, err := os.Open(KEEP_FILE_NAME)
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-	defer object.Close()
-	objectStat, err := object.Stat()
-	if err != nil {
-		log.Println(err)
-		return err
-	}
 
-	n, err := m.client.PutObject(m.bucketName, name + "/" + KEEP_FILE_NAME, object, objectStat.Size(), minio.PutObjectOptions{ContentType: "application/octet-stream"})
+	name = strings.TrimPrefix(name, "/")
+
+	fileBytes := bytes.NewBuffer([]byte{})
+	n, err := m.client.PutObject(m.bucketName, name + KEEP_FILE_NAME, bytes.NewBuffer([]byte{}), int64(fileBytes.Len()), minio.PutObjectOptions{ContentType: "application/octet-stream"})
 	if err != nil {
 		log.Println(err)
 		return err
