@@ -28,7 +28,9 @@ func (wdrg *WebDAVRouterGroup) WebDAVAnyPaths(basePath string, handlers ...gin.H
 	currentPath := "/"
 	for i:=0; i<config.GetInt("webdav.supported_folder_depth"); i++ {
 		p := fmt.Sprintf(":path%d", i)
-		currentPath += p + "/"
+		currentPath += p
+		wdrg.WebDAVAny(basePath + currentPath, handlers...)
+		currentPath += "/"
 		wdrg.WebDAVAny(basePath + currentPath, handlers...)
 	}
 }
