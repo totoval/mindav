@@ -2,3 +2,5 @@
 framework
 .env.json
 go.sum
+.env.home.json
+.env.local.json
