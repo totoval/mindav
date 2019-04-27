@@ -71,9 +71,6 @@ func (m Minio) MkBucket() (err error) {
 	log.Printf("Successfully created %s\n", m.bucketName)
 	return nil
 }
-func (m Minio) resolve() string {
-	return ""
-}
 func (m Minio)Mkdir(ctx context.Context, name string, perm os.FileMode) error {
 	const KEEP_FILE_NAME = ".mindavkeep"
 
