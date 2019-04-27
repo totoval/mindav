@@ -7,6 +7,7 @@ import (
 	"github.com/minio/minio-go"
 	"github.com/totoval/framework/config"
 	"golang.org/x/net/webdav"
+	"io"
 	"log"
 	"os"
 	"strings"
@@ -130,8 +131,16 @@ func (mo minioObject) Stat() (os.FileInfo, error) {
 	if err != nil {
 		log.Println("minioObject stat", err)
 		if _err, ok := err.(minio.ErrorResponse); ok {
-			if _err.Code == "NoSuchKey" {
+			if _err.Code == "NoSuchKey" { // @todo maybe file 404 either
 				// dir
+
+				// fmt.Println("---------------------------------------")
+				// if !strings.HasSuffix(mo.name, "/"){
+				// 	mo.name = mo.name + "/"
+				// }
+				// fl, err := mo.Readdir(0)
+				// debug.Dump(fl, err)
+
 				return minioObjectInfo{minio.ObjectInfo{
 					Key: mo.name,
 					Size: 0,
@@ -153,10 +162,17 @@ func (mo minioObject) Stat() (os.FileInfo, error) {
 	oi, err := mo.Object.Stat()
 	return minioObjectInfo{oi}, err
 }
-
+func (mo minioObject)ReadFrom(r io.Reader) (n int64, err error) {
+	n, err = mo.m.client.PutObject(mo.m.bucketName, mo.name, r, -1, minio.PutObjectOptions{ContentType:"application/octet-stream"})
+	if err != nil {
+		fmt.Println(err)
+		return 0, err
+	}
+	fmt.Println("Successfully uploaded bytes: ", n)
+	return n, nil
+}
 func (mo minioObject) Write(p []byte) (n int, err error) {
-	panic("implement me")
-	return 0, nil //@todo
+	return len(p), nil //useless
 }
 
 func(mo minioObject)Readdir(count int)(fileInfoList []os.FileInfo, err error){
@@ -168,7 +184,7 @@ func(mo minioObject)Readdir(count int)(fileInfoList []os.FileInfo, err error){
 	// Indicate to our routine to exit cleanly upon return.
 	defer close(doneCh)
 	// List all objects from a bucket-name with a matching prefix.
-	for object := range mo.m.client.ListObjects(mo.m.bucketName, name, false, doneCh) {
+	for object := range mo.m.client.ListObjectsV2(mo.m.bucketName, name, false, doneCh) {
 		err = object.Err
 		if err != nil {
 			fmt.Println(object.Err)
