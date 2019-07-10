@@ -2,8 +2,9 @@ package groups
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"github.com/totoval/framework/config"
+	"github.com/totoval/framework/request"
+	"github.com/totoval/framework/route"
 
 	"totoval/app/http/controllers"
 )
@@ -11,10 +12,22 @@ import (
 type WebDAVGroup struct {
 	WebDAVController controllers.WebDAV
 }
-type WebDAVRouterGroup struct {
-	*gin.RouterGroup
+func (wdg *WebDAVGroup)Group(group route.Grouper) {
+	webDAVGroup := WebDAVRouterGroup{group}
+	// webDAVGroup.WebDAVAny(config.GetString("webdav.base_url"), wdg.WebDAVController.Handle)
+	// webDAVGroup.WebDAVAny(config.GetString("webdav.base_url") + "/", wdg.WebDAVController.Handle)
+	//
+	// webDAVGroup.WebDAVAnyPaths(config.GetString("webdav.base_url"), wdg.WebDAVController.Handle)
+	webDAVGroup.WebDAVAny("", wdg.WebDAVController.Handle)
+	webDAVGroup.WebDAVAny("/", wdg.WebDAVController.Handle)
+
+	webDAVGroup.WebDAVAnyPaths("", wdg.WebDAVController.Handle)
 }
-func (wdrg *WebDAVRouterGroup) WebDAVAny(relativePath string, handlers ...gin.HandlerFunc) {
+
+type WebDAVRouterGroup struct {
+	route.Grouper
+}
+func (wdrg *WebDAVRouterGroup) WebDAVAny(relativePath string, handlers ...request.HandlerFunc) {
 	wdrg.Any(relativePath, handlers...)
 	wdrg.Handle("PROPFIND", relativePath, handlers...)
 	wdrg.Handle("PROPPATCH", relativePath, handlers...)
@@ -24,7 +37,7 @@ func (wdrg *WebDAVRouterGroup) WebDAVAny(relativePath string, handlers ...gin.Ha
 	wdrg.Handle("LOCK", relativePath, handlers...)
 	wdrg.Handle("UNLOCK", relativePath, handlers...)
 }
-func (wdrg *WebDAVRouterGroup) WebDAVAnyPaths(basePath string, handlers ...gin.HandlerFunc) {
+func (wdrg *WebDAVRouterGroup) WebDAVAnyPaths(basePath string, handlers ...request.HandlerFunc) {
 	currentPath := "/"
 	for i:=0; i<config.GetInt("webdav.supported_folder_depth"); i++ {
 		p := fmt.Sprintf(":path%d", i)
@@ -32,17 +45,5 @@ func (wdrg *WebDAVRouterGroup) WebDAVAnyPaths(basePath string, handlers ...gin.H
 		wdrg.WebDAVAny(basePath + currentPath, handlers...)
 		currentPath += "/"
 		wdrg.WebDAVAny(basePath + currentPath, handlers...)
-	}
-}
-
-func (wdg *WebDAVGroup) Register(group *gin.RouterGroup) {
-
-	newGroup := group.Group("")
-	{
-		webDAVGroup := WebDAVRouterGroup{newGroup}
-		webDAVGroup.WebDAVAny(config.GetString("webdav.base_url"), wdg.WebDAVController.Handle)
-		webDAVGroup.WebDAVAny(config.GetString("webdav.base_url") + "/", wdg.WebDAVController.Handle)
-
-		webDAVGroup.WebDAVAnyPaths(config.GetString("webdav.base_url"), wdg.WebDAVController.Handle)
 	}
 }

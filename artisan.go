@@ -1,67 +1,74 @@
 package main
 
 import (
-	"github.com/totoval/framework/cmd"
-	"github.com/totoval/framework/cmd/groups"
-	"github.com/totoval/framework/database"
-	"github.com/totoval/framework/helpers/m"
-	"github.com/urfave/cli"
-	"log"
 	"os"
-	"totoval/config"
+
+	"github.com/totoval/framework/graceful"
+	"github.com/totoval/framework/helpers/log"
+	"github.com/totoval/framework/sentry"
+
+	"totoval/bootstrap"
+
+	"github.com/urfave/cli"
+
+	"github.com/totoval/framework/console"
+
 	"totoval/database/migrations"
+
+	"github.com/totoval/framework/cmd"
+	command_queue "github.com/totoval/framework/cmd/commands/queue"
+	"github.com/totoval/framework/cmd/commands/schedule"
+
+	app_schedule "totoval/app/console"
+
+	"totoval/app/console/commands"
 )
 
 func init() {
-	config.Initialize()
-	database.Initialize()
-	m.Initialize()
+	bootstrap.Initialize()
+
+	migrations.Initialize()
+	command_queue.Initialize()
+	commands.Initialize()
+	schedule.Initialize()
+
+	app_schedule.Schedule(cmd.NewSchedule())
 }
 
 func main() {
+	cliServe()
+}
+
+func cliServe() {
 	app := cli.NewApp()
 	app.Name = "artisan"
 	app.Usage = "Let's work like an artisan"
+	app.Version = "0.5.5"
 
-	chLog := make(chan interface{})
-
-	// command group
-	migrateCommand := &groups.MigrateCommand{MigratorInitializer: migrations.Initialize, ChLog: chLog}
-
-	//app.Flags = []cli.Flag {
-	//	cli.StringFlag{
-	//		Name:        "lang",
-	//		Value:       "english",
-	//		Usage:       "language for the greeting",
-	//		Destination: &language,
-	//	},
-	//}
+	app.Commands = cmd.List()
 
 	app.Action = func(c *cli.Context) error {
+		console.Println(console.CODE_INFO, "COMMANDS:")
+
+		for _, cate := range app.Categories() {
+			categoryName := cate.Name
+			if categoryName == "" {
+				categoryName = "kernel"
+			}
+			console.Println(console.CODE_WARNING, "    "+categoryName+":")
+
+			for _, cmds := range cate.Commands {
+				console.Println(console.CODE_SUCCESS, "        "+cmds.Name+" "+console.Sprintf(console.CODE_INFO, "%s", cmds.ArgsUsage)+"    "+console.Sprintf(console.CODE_WARNING, "%s", cmds.Usage))
+			}
+		}
 		return nil
 	}
 
-	app.Commands = []cli.Command{
-		migrateCommand.MigrationInit(),
-		migrateCommand.Migrate(),
-		migrateCommand.MigrateRollBack(),
+	if err := app.Run(os.Args); err != nil {
+		sentry.CaptureError(err)
+		log.Fatal(err.Error())
 	}
 
-	err := app.Run(os.Args)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	receiveLog(chLog)
-}
-
-func receiveLog(chLog chan interface{}) {
-	for _log := range chLog {
-		if _log == nil {
-			os.Exit(0)
-		}
-		if __log, ok := _log.(cmd.TermLog); ok {
-			__log.Print()
-		}
-	}
+	// totoval framework shutdown
+	graceful.ShutDown(true)
 }

@@ -1,50 +1,70 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
-	"gopkg.in/go-playground/validator.v9"
+	"context"
 	"net/http"
-	"reflect"
-	"sync"
-	"time"
-
-	"github.com/totoval/framework/cache"
+	"os"
+	"os/signal"
+	"syscall"
 
 	c "github.com/totoval/framework/config"
-	"github.com/totoval/framework/database"
-	"github.com/totoval/framework/helpers/m"
+	"github.com/totoval/framework/graceful"
+	"github.com/totoval/framework/helpers/log"
+	"github.com/totoval/framework/helpers/toto"
+	"github.com/totoval/framework/helpers/zone"
 	"github.com/totoval/framework/http/middleware"
-
-	"totoval/config"
-	"totoval/resources/lang"
+	"github.com/totoval/framework/request"
+	"github.com/totoval/framework/sentry"
+	"totoval/bootstrap"
 	"totoval/resources/views"
 	"totoval/routes"
 )
 
 func init() {
-	config.Initialize()
-	cache.Initialize()
-	database.Initialize()
-	m.Initialize()
-	lang.Initialize() // an translation must contains resources/lang/xx.json file (then a resources/lang/validation_translator/xx.go)
+	bootstrap.Initialize()
 }
 
+// @caution cannot use config methods to get config in init function
 func main() {
+	//j := &jobs.ExampleJob{}
+	//j.SetParam(&pbs.ExampleJob{Query: "test", PageNumber: 111, ResultPerPage: 222})
+	////j.SetDelay(5 * zone.Second)
+	//err := job.Dispatch(j)
+	//fmt.Println(err)
 
-	// upgrade gin validator v8 to v9
-	binding.Validator = new(defaultValidator)
+	//go hub.On("add-user-affiliation")  // go run artisan.go queue:listen add-user-affiliation
 
-	r := gin.Default()
+	ctx, cancel := context.WithCancel(context.Background())
 
-	if c.GetString("app.env") == "production" {
-		r.Use(gin.Logger())
+	quit := make(chan os.Signal, 1)
+	// kill (no param) default send syscanll.SIGTERM
+	// kill -2 is syscall.SIGINT
+	// kill -9 is syscall. SIGKILL but can"t be catch, so don't need add it
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 
-		r.Use(gin.Recovery())
-	}
+	go func() {
+		call := <-quit
+		log.Info("system call", toto.V{"call": call})
+		cancel()
+	}()
+
+	httpServe(ctx)
+}
+
+func httpServe(ctx context.Context) {
+	r := request.New()
+
+	sentry.Use(r.GinEngine(), false)
 
 	if c.GetBool("app.debug") {
 		r.Use(middleware.RequestLogger())
+	}
+
+	r.RedirectTrailingSlash = false
+
+	if c.GetString("app.env") == "production" {
+		r.Use(middleware.Logger())
+		r.Use(middleware.Recovery())
 	}
 
 	r.Use(middleware.Locale())
@@ -53,63 +73,35 @@ func main() {
 
 	views.Initialize(r)
 
-	r.RedirectTrailingSlash = false
 	s := &http.Server{
 		Addr:           ":" + c.GetString("app.port"),
 		Handler:        r,
-		ReadTimeout:    time.Duration(c.GetInt64("app.read_timeout_seconds")) * time.Second,
-		WriteTimeout:   time.Duration(c.GetInt64("app.write_timeout_seconds")) * time.Second,
+		ReadTimeout:    zone.Duration(c.GetInt64("app.read_timeout_seconds")) * zone.Second,
+		WriteTimeout:   zone.Duration(c.GetInt64("app.write_timeout_seconds")) * zone.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	if err := s.ListenAndServe(); err != nil {
-		panic(err)
-	}
-}
-
-// gin validator v8 to v9
-type defaultValidator struct {
-	once     sync.Once
-	validate *validator.Validate
-}
-
-var _ binding.StructValidator = &defaultValidator{}
-
-func (v *defaultValidator) ValidateStruct(obj interface{}) error {
-
-	if kindOfData(obj) == reflect.Struct {
-
-		v.lazyinit()
-
-		if err := v.validate.Struct(obj); err != nil {
-			return error(err)
+	go func() {
+		if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatal(err.Error())
 		}
+	}()
+
+	<-ctx.Done()
+
+	log.Info("Shutdown Server ...")
+
+	// Wait for interrupt signal to gracefully shutdown the server with
+	// a timeout of 5 seconds.
+	_ctx, cancel := context.WithTimeout(ctx, 5*zone.Second)
+	defer cancel()
+
+	if err := s.Shutdown(_ctx); err != nil {
+		log.Fatal("Server Shutdown: ", toto.V{"error": err})
 	}
 
-	return nil
-}
+	// totoval framework shutdown
+	graceful.ShutDown(false)
 
-func (v *defaultValidator) Engine() interface{} {
-	v.lazyinit()
-	return v.validate
-}
-
-func (v *defaultValidator) lazyinit() {
-	v.once.Do(func() {
-		v.validate = validator.New()
-		v.validate.SetTagName("binding")
-
-		// add any custom validations etc. here
-	})
-}
-
-func kindOfData(data interface{}) reflect.Kind {
-
-	value := reflect.ValueOf(data)
-	valueType := value.Kind()
-
-	if valueType == reflect.Ptr {
-		valueType = value.Elem().Kind()
-	}
-	return valueType
+	log.Info("Server exiting")
 }

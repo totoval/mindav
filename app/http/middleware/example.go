@@ -1,14 +1,13 @@
 package middleware
 
 import (
-	"github.com/gin-gonic/gin"
-	"log"
-	"time"
+	"github.com/totoval/framework/helpers/log"
+	"github.com/totoval/framework/helpers/zone"
 )
 
-func Example() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		t := time.Now()
+func Example() request.HandlerFunc {
+	return func(c *request.Context) {
+		t := zone.Now()
 
 		// Set example variable
 		c.Set("example", "12345")
@@ -18,11 +17,11 @@ func Example() gin.HandlerFunc {
 		c.Next()
 
 		// after request
-		latency := time.Since(t)
-		log.Print(latency)
+		latency := zone.Since(t)
+		log.Info("latency", toto.V{"latency": latency})
 
 		// access the status we are sending
 		status := c.Writer.Status()
-		log.Println(status)
+		log.Info("status", toto.V{"status": status})
 	}
 }

@@ -1,12 +1,13 @@
 package routes
 
 import (
-	"github.com/gin-gonic/gin"
+	"github.com/totoval/framework/request"
+	"github.com/totoval/framework/route"
 	"totoval/routes/versions"
 )
 
-func Register(router *gin.Engine) {
-	version := &versions.V1{Prefix: "v1"}
+func Register(router *request.Engine) {
+	defer route.Bind()
 
-	version.Register(router)
+	versions.NewV1(router)
 }

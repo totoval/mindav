@@ -4,15 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 
 	"github.com/totoval/framework/helpers/debug"
-
 	"github.com/totoval/framework/helpers/ptr"
-
+	"github.com/totoval/framework/helpers/zone"
 	"github.com/totoval/framework/model/helper"
 
 	"github.com/totoval/framework/helpers/m"
@@ -23,33 +20,25 @@ const AFFILIATION_CODE_LENGTH uint = 6
 
 type UserAffiliation struct {
 	UserID    *uint      `gorm:"column:user_id;primary_key;type:int unsigned"`
-	Code      *string    `gorm:"column:uaff_code;type:varchar(32);not null"`
+	Code      *string    `gorm:"column:uaff_code;type:varchar(32);unique_index;not null"`
 	FromCode  *string    `gorm:"column:uaff_from_code;type:varchar(32)"`
 	Root      *uint      `gorm:"column:uaff_root_id;type:int unsigned"`
 	Parent    *uint      `gorm:"column:uaff_parent_id;type:int unsigned"`
-	Left      *uint      `gorm:"column:uaff_left_id;type:int unsigned"`
-	Right     *uint      `gorm:"column:uaff_right_id;type:int unsigned"`
-	Level     *uint      `gorm:"column:uaff_level;type:int unsigned"`
-	CreatedAt *time.Time `gorm:"column:user_created_at"`
-	UpdatedAt time.Time  `gorm:"column:user_updated_at"`
-	DeletedAt *time.Time `gorm:"column:user_deleted_at"`
+	Left      *uint      `gorm:"column:uaff_left_id;type:int unsigned;not null"`
+	Right     *uint      `gorm:"column:uaff_right_id;type:int unsigned;not null"`
+	Level     *uint      `gorm:"column:uaff_level;type:int unsigned;not null"`
+	CreatedAt *zone.Time `gorm:"column:user_created_at"`
+	UpdatedAt zone.Time  `gorm:"column:user_updated_at"`
+	DeletedAt *zone.Time `gorm:"column:user_deleted_at"`
 	model.BaseModel
 }
 
 func (uaff *UserAffiliation) TableName() string {
-	return uaff.SetTableName("user_affiliations")
+	return uaff.SetTableName("user_affiliation")
 }
 
 func (uaff *UserAffiliation) Default() interface{} {
 	return UserAffiliation{}
-}
-
-func (uaff *UserAffiliation) InsertRoot() {
-	// 'uaff_user_id' => $root_user_id,
-	//     'uaff_root_id' => $root_user_id,
-	//     'uaff_level' => 1,
-	//     'uaff_left' => 1,
-	//     'uaff_right' => 2
 }
 
 func (uaff *UserAffiliation) generateCode(user *User) (string, error) {
@@ -168,9 +157,9 @@ func (uaff *UserAffiliation) Tree(rootID uint) ([]UserAffiliation, error) {
 	}
 
 	nodes, err := uaff.ObjArr([]model.Filter{
-		{Key: "uaff_root_id", Op: "=", Val: *root.UserID},
-		{Key: "uaff_left_id", Op: ">", Val: *root.Left},
-		{Key: "uaff_right_id", Op: "<", Val: *root.Right},
+		{Key: "uaff_root_id", Op: "=", Val: root.UserID},
+		{Key: "uaff_left_id", Op: ">", Val: root.Left},
+		{Key: "uaff_right_id", Op: "<", Val: root.Right},
 	}, []model.Sort{
 		{Key: "uaff_left_id", Direction: model.ASC},
 	}, 0, false)
@@ -181,7 +170,16 @@ func (uaff *UserAffiliation) Tree(rootID uint) ([]UserAffiliation, error) {
 
 	return nodes.([]UserAffiliation), nil
 }
+func (uaff *UserAffiliation) CountByParent(parentID uint) (uint, error) {
+	parent := UserAffiliation{
+		UserID: &parentID,
+	}
+	if err := m.H().First(&parent, false); err != nil {
+		return 0, err
+	}
 
+	return (*parent.Right - 1 - *parent.Left) / 2, nil
+}
 func (uaff *UserAffiliation) TreeByParent(parentID uint) ([]UserAffiliation, error) {
 	parent := UserAffiliation{
 		UserID: &parentID,
@@ -191,9 +189,9 @@ func (uaff *UserAffiliation) TreeByParent(parentID uint) ([]UserAffiliation, err
 	}
 
 	nodes, err := uaff.ObjArr([]model.Filter{
-		{Key: "uaff_root_id", Op: "=", Val: *parent.Root},
-		{Key: "uaff_left_id", Op: ">", Val: *parent.Left},
-		{Key: "uaff_right_id", Op: "<", Val: *parent.Right},
+		{Key: "uaff_root_id", Op: "=", Val: parent.Root},
+		{Key: "uaff_left_id", Op: ">", Val: parent.Left},
+		{Key: "uaff_right_id", Op: "<", Val: parent.Right},
 	}, []model.Sort{
 		{Key: "uaff_left_id", Direction: model.ASC},
 	}, 0, false)
@@ -253,7 +251,8 @@ func (t *Tree) recursiveCombineTree(current Tree, level uint, nodes []UserAffili
 			_current := Tree{
 				ID:       *uaff.UserID,
 				Children: []Tree{},
-				Name:     *uaff.Code, Value: *uaff.Code,
+				Name:     *uaff.Code,
+				Value:    *uaff.Code,
 			}
 			_current.Children = t.recursiveCombineTree(_current, level+1, nodes)
 
@@ -272,7 +271,7 @@ func (uaff *UserAffiliation) ObjArr(filterArr []model.Filter, sortArr []model.So
 	}
 	return outArr, nil
 }
-func (uaff *UserAffiliation) ObjArrPaginate(c *gin.Context, perPage uint, filterArr []model.Filter, sortArr []model.Sort, limit int, withTrashed bool) (pagination model.Pagination, err error) {
+func (uaff *UserAffiliation) ObjArrPaginate(c model.Context, perPage uint, filterArr []model.Filter, sortArr []model.Sort, limit int, withTrashed bool) (pagination model.Pagination, err error) {
 	var outArr []UserAffiliation
 	filter := model.Model(*m.H().Q(filterArr, sortArr, limit, withTrashed))
 	return filter.Paginate(&outArr, c, perPage)
