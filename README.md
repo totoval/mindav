@@ -1,4 +1,5 @@
 # Mindav
+![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/totoval/mindav.svg)
 ![GitHub last commit](https://img.shields.io/github/last-commit/totoval/mindav.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/totoval/mindav)](https://goreportcard.com/report/github.com/totoval/mindav)
 ![Travis (.org)](https://img.shields.io/travis/totoval/mindav.svg)
