@@ -1,0 +1,20 @@
+language: go
+os:
+  - linux
+  - osx
+go:
+  - master
+env:
+  - GO111MODULE=on
+script:
+  - go build -o ./builds/main_$TRAVIS_OS_NAME ./main.go
+#- go build -o ./builds/artisan_$TRAVIS_OS_NAME ./artisan.go
+deploy:
+  provider: releases
+  api_key:
+    secure: pFtTcRuMBq6hK05WiG0jh6Q5ak8VD8awU2iQL6Wjvw+deRPeIR9OYpTgwh3h83ZWaRmq6iMMI2Rf0zMIi0iTvkYqqAPcOxudaxdZmHXxMdu8D+ScPF1rKxJmy7QKrShwZtjawY8wR8lNLRvxWWJA2L2Qsf5N6Px3QkmFSSyw0FKAt88sOJbYMK7/Ce4B1M6uGSPDxgmoab9jHpdkse3YfwknUj9w6RpdmE1H7RlmlB7OIe3icoTAyCbO7Pq+WjdCttd8ehWOr7cG/l8GSnd/wiivZwo1D+m9l74dDMDvvm5W4Gstc3FRUg7Xx60nmhSntgwV5dtvEPtxZNqdf6HEnk6O13SUVTEjGHFlKdJvJuCPMaht5BDWDxEsM2NW8Z8AoqEo8MeL3PUN2EqvvZRbWZIJgx1zxkRcYDNPgJHmRknmrt3SbaMKAVZdUXywwR9WCgpQ/HSVlbePGGxELGbthlkmb7MktUsRbV1FE/5UanixgOYuzOKfHg3Vbojc4JnrwtIoqtomfzjPWZ4+hACude5kciM4QiABymDDe8KY7QJP+6QoAPqWaj5dGSXEUs0+U5r7K0+5V/UfCRp6U7Qd5YDI2v7VxSdt6Gx18tKQn05lS54h7Z4mFtvWEjptT7451esRf1hBNYFZGdaJbVKTO3edYBSXYWl8moOXuN/LhCU=
+  file_glob: true
+  file: "./builds/*"
+  skip_cleanup: true
+  on:
+    repo: totoval/mindav
