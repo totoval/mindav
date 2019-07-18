@@ -24,6 +24,8 @@ Mindav is a webdav server which is supported multi file backends such as minio, 
     }
     ```
 * Run `go run main.go` or the run the binary
+* Now you can connect the Mindav by using webdav clients, such as [Cyberduck](http://cyberduck.io):  
+<img src="https://raw.githubusercontent.com/totoval/mindav/master/readme_assets/D133AD6B-755F-4878-826F-FC9A6A0BA273.png" alt="cyberduck client" width="300" />
 
 ## Supported Clients(KNOWN):   
 * [Cyberduck](http://cyberduck.io) for `OSX`  
