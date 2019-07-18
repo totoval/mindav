@@ -16,12 +16,13 @@ Webdav loves Minio
 > Web Distributed Authoring and Versioning (WebDAV) is an extension of the Hypertext Transfer Protocol (HTTP) that allows clients to perform remote Web content authoring operations.   
 
 There're many cloud storages that support webdav protocol, such as **dropbox**, **owncloud**, **nextcloud**, etc.   
+  
 ***Webdav provide a simple port for your files.***
 
 ### Minio
 > The 100% Open Source, Enterprise-Grade, Amazon S3 Compatible Object Storage  
-
-***Minio is [reliable](https://docs.min.io/docs/minio-erasure-code-quickstart-guide.html) for your files. ***
+  
+***Minio is [reliable](https://docs.min.io/docs/minio-erasure-code-quickstart-guide.html) for your files.***
 
 ## Structure
 
