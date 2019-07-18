@@ -7,7 +7,7 @@
 ![GitHub](https://img.shields.io/github/license/totoval/mindav.svg)
 
 ## About MinDAV
-Mindav is a webdav server which is supported multi file backends such as minio, memory and file.  
+MinDAV is a WebDAV server which is supported multi file backends such as minio, memory and file.  
   
 **WebDAV ❤️ Minio**
 
