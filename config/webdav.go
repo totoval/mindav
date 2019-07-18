@@ -15,6 +15,7 @@ func init() {
 		},
 		"minio": map[string]interface{}{
 			"endpoint": Env("MINIO_ENDPOINT", "play.min.io:9000"),
+			"bucket": Env("MINIO_BUCKET", "bucket_name"),
 			"access_key_id": Env("MINIO_ACCESS_KEY_ID", "access_key_id"),
 			"secret_access_key": Env("MINIO_SECRET_ACCESS_KEY", "secret_access_key"),
 			"use_ssl": Env("MINIO_USE_SSL", true),

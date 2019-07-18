@@ -8,12 +8,10 @@ import (
 var mindavHandler webdav.Handler
 func Initialize(){
 
-	username := "toby"
-
 	uri := "/v1" + config.GetString("webdav.base_url")
 	mindavHandler = webdav.Handler{
 		Prefix: uri,
-		FileSystem: fileSystem(username),
+		FileSystem: fileSystem(),
 		LockSystem: webdav.NewMemLS(),
 	}
 }
