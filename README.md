@@ -8,19 +8,43 @@
 ## About Mindav
 Mindav is a webdav server which is supported multi file backends such as minio, memory and file.
 
+## Getting Started
+> Assumed that you already have your Minio server running. Or [Quick Run Minio Server](#quick-run-minio-server) 
+* `cp .env.example.json .env.json`
+* Config your Minio in your `.env.json` file
+    ```json
+    {
+      "WEBDAV_DRIVER": "minio",
+      "MINIO_ENDPOINT": "play.min.io:9000",
+      "MINIO_ACCESS_KEY_ID": "access_key_id",
+      "MINIO_SECRET_ACCESS_KEY": "secret_access_key",
+      "MINIO_BUCKET": "bucket_name",
+      "MINIO_USE_SSL": false
+    }
+    ```
+* Run `go run main.go` or the run the binary
+
+## Supported Clients(KNOWN):   
+* [Cyberduck](http://cyberduck.io) for `OSX`  
+* [PhotoSync](http://www.photosync-app.com) for `iOS`
+* and More...
+> `OSX`'s `finder` is not support for `rename` operate!
+
+## Quick Run Minio Server
+```sh
+docker run --name minio --rm -it \ 
+    -p "9000:9000" \ 
+    -v "./minio/data:/data" \ 
+    -v "./minio/config:/root/.minio" \ 
+    minio/minio:latest \ 
+    server /data
+```
+
 ## Roadmap
 - [x] Memory filesystem support
 - [x] File filesystem support
-- [ ] Minio filesystem support
+- [x] Minio filesystem support
 - [ ] User system
 
 ## Thanks
-* gin
-* gorm
-* validator.v9
-* viper
-* big
-* jwt
-* i18n
-* urfave/cli
-* fatih/color
+* [Totoval](https://github.com/totoval/totoval)
