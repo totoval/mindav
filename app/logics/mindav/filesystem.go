@@ -15,8 +15,6 @@ func fileSystem(namespace string) webdav.FileSystem {
 		return webdav.NewMemFS()
 	case "file":
 		return webdav.Dir(config.GetString("webdav.filesystems.file.base_path"))
-	case "minioLegend":
-		return driver.NewMinio(namespace, config.GetString("webdav.filesystems.minio.location"))
 	case "minio":
 		return  miniofs.New(namespace, config.GetString("webdav.filesystems.minio.location"))
 	default:
