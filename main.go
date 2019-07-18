@@ -57,7 +57,7 @@ func httpServe(ctx context.Context) {
 	sentry.Use(r.GinEngine(), false)
 
 	if c.GetBool("app.debug") {
-		r.Use(middleware.RequestLogger())
+		//r.Use(middleware.RequestLogger())
 	}
 
 	r.RedirectTrailingSlash = false
