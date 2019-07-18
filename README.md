@@ -6,19 +6,19 @@
 ![GitHub top language](https://img.shields.io/github/languages/top/totoval/mindav.svg)
 ![GitHub](https://img.shields.io/github/license/totoval/mindav.svg)
 
-## About Mindav
+## About MinDAV
 Mindav is a webdav server which is supported multi file backends such as minio, memory and file.  
   
-**Webdav ❤️ Minio**
+**WebDAV ❤️ Minio**
 
 ## Why them?
-### Webdav
+### WebDAV
 
 > Web Distributed Authoring and Versioning (WebDAV) is an extension of the Hypertext Transfer Protocol (HTTP) that allows clients to perform remote Web content authoring operations.   
 
 There're many cloud storages that support webdav protocol, such as **dropbox**, **owncloud**, **nextcloud**, etc.   
   
-***Webdav provide a simple port for your files.***
+***WebDAV provides a simple port for your files.***
 
 ### Minio
 > The 100% Open Source, Enterprise-Grade, Amazon S3 Compatible Object Storage  
@@ -27,7 +27,7 @@ There're many cloud storages that support webdav protocol, such as **dropbox**, 
 
 ## Structure
 
-`WebdavClients <---> Mindav <---> Minio `
+`WebDAVClients <---> MinDAV <---> Minio `
 
 ## Getting Started
 > Assumed that you already have your [Minio](https://github.com/minio/minio) server running. Or [Quick Run Minio Server](#quick-run-minio-server) 
