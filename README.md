@@ -8,7 +8,8 @@
 
 ## About Mindav
 Mindav is a webdav server which is supported multi file backends such as minio, memory and file.  
-Webdav loves Minio
+  
+**Webdav ❤️ Minio**
 
 ## Why them?
 ### Webdav
