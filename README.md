@@ -10,7 +10,7 @@
 Mindav is a webdav server which is supported multi file backends such as minio, memory and file.
 
 ## Getting Started
-> Assumed that you already have your Minio server running. Or [Quick Run Minio Server](#quick-run-minio-server) 
+> Assumed that you already have your [Minio](https://github.com/minio/minio) server running. Or [Quick Run Minio Server](#quick-run-minio-server) 
 * `cp .env.example.json .env.json`
 * Config your Minio in your `.env.json` file
     ```json
