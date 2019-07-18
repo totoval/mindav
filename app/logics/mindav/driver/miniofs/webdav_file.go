@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/minio/minio-go/v6"
-	"github.com/totoval/framework/helpers/toto"
 	"github.com/totoval/framework/helpers/log"
+	"github.com/totoval/framework/helpers/toto"
 	"io"
 	"os"
 	"strings"
@@ -17,16 +17,15 @@ type file struct {
 	name string
 }
 
-
 func (mo file) Stat() (os.FileInfo, error) {
-	log.Trace("file stat", toto.V{"name":mo.name})
+	log.Trace("file stat", toto.V{"name": mo.name})
 	return mo.m.Stat(context.Background(), mo.name)
 }
 func (mo file) ReadFrom(r io.Reader) (n int64, err error) {
 	n, err = mo.m.client.PutObject(mo.m.bucketName, strings.TrimPrefix(mo.name, "/"), r, -1, minio.PutObjectOptions{ContentType: "application/octet-stream"})
 	if err != nil {
 
-		return 0, log.Error(err, toto.V{"op":"ReadFrom", "name":mo.name})
+		return 0, log.Error(err, toto.V{"op": "ReadFrom", "name": mo.name})
 	}
 	fmt.Println("Successfully uploaded bytes: ", n)
 	return n, nil
@@ -36,7 +35,7 @@ func (mo file) Write(p []byte) (n int, err error) {
 }
 
 func (mo file) Readdir(count int) (fileInfoList []os.FileInfo, err error) {
-	log.Trace("file readDir", toto.V{"name":mo.name})
+	log.Trace("file readDir", toto.V{"name": mo.name})
 
 	name, err := clearName(mo.name)
 	if err != nil {

@@ -12,7 +12,8 @@ import (
 type WebDAVGroup struct {
 	WebDAVController controllers.WebDAV
 }
-func (wdg *WebDAVGroup)Group(group route.Grouper) {
+
+func (wdg *WebDAVGroup) Group(group route.Grouper) {
 	webDAVGroup := WebDAVRouterGroup{group}
 	// webDAVGroup.WebDAVAny(config.GetString("webdav.base_url"), wdg.WebDAVController.Handle)
 	// webDAVGroup.WebDAVAny(config.GetString("webdav.base_url") + "/", wdg.WebDAVController.Handle)
@@ -27,6 +28,7 @@ func (wdg *WebDAVGroup)Group(group route.Grouper) {
 type WebDAVRouterGroup struct {
 	route.Grouper
 }
+
 func (wdrg *WebDAVRouterGroup) WebDAVAny(relativePath string, handlers ...request.HandlerFunc) {
 	wdrg.Any(relativePath, handlers...)
 	wdrg.Handle("PROPFIND", relativePath, handlers...)
@@ -39,11 +41,11 @@ func (wdrg *WebDAVRouterGroup) WebDAVAny(relativePath string, handlers ...reques
 }
 func (wdrg *WebDAVRouterGroup) WebDAVAnyPaths(basePath string, handlers ...request.HandlerFunc) {
 	currentPath := "/"
-	for i:=0; i<config.GetInt("webdav.supported_folder_depth"); i++ {
+	for i := 0; i < config.GetInt("webdav.supported_folder_depth"); i++ {
 		p := fmt.Sprintf(":path%d", i)
 		currentPath += p
-		wdrg.WebDAVAny(basePath + currentPath, handlers...)
+		wdrg.WebDAVAny(basePath+currentPath, handlers...)
 		currentPath += "/"
-		wdrg.WebDAVAny(basePath + currentPath, handlers...)
+		wdrg.WebDAVAny(basePath+currentPath, handlers...)
 	}
 }

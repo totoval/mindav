@@ -9,7 +9,8 @@ import (
 type WebDAV struct {
 	controller.BaseController
 }
-func (wd *WebDAV) Handle (c *request.Context){
+
+func (wd *WebDAV) Handle(c *request.Context) {
 	mindav.Handler().ServeHTTP(c.Writer, c.Request)
 	return
 }

@@ -6,11 +6,12 @@ import (
 )
 
 var mindavHandler webdav.Handler
-func Initialize(){
+
+func Initialize() {
 
 	uri := "/v1" + config.GetString("webdav.base_url")
 	mindavHandler = webdav.Handler{
-		Prefix: uri,
+		Prefix:     uri,
 		FileSystem: fileSystem(),
 		LockSystem: webdav.NewMemLS(),
 	}
