@@ -1,0 +1,28 @@
+version: "2"
+services:
+
+  minio:
+    image: minio/minio:latest
+    expose:
+      - "9000"
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./minio/data:/export
+    environment:
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: miniostorage
+    command: server /export
+    restart: always
+
+  mindav:
+    image: totoval/mindav:latest
+    depends_on:
+      - minio
+    links:
+      - minio
+    expose:
+      - "80"
+    ports:
+      - "80:80"
+    restart: always
