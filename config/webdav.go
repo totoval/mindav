@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/gin-gonic/gin"
 	. "github.com/totoval/framework/config"
 )
 
@@ -25,6 +26,10 @@ func init() {
 	webdav["base_path"] = "." // for "file" filesystem
 	webdav["supported_folder_depth"] = 10
 	webdav["base_url"] = "/webdav"
+
+	webdav["accounts"] = gin.Accounts{
+		Env("WEBDAV_USER", "username").(string): Env("WEBDAV_PASSWORD", "password").(string),
+	}
 
 	Add("webdav", webdav)
 }

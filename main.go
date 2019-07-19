@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
 	"os/signal"
@@ -57,7 +58,7 @@ func httpServe(ctx context.Context) {
 	sentry.Use(r.GinEngine(), false)
 
 	if c.GetBool("app.debug") {
-		//r.Use(middleware.RequestLogger())
+		r.Use(middleware.RequestLogger())
 	}
 
 	r.RedirectTrailingSlash = false
@@ -68,6 +69,8 @@ func httpServe(ctx context.Context) {
 	}
 
 	r.Use(middleware.Locale())
+
+	r.UseGin(gin.BasicAuth(c.Get("webdav.accounts").(gin.Accounts)))
 
 	routes.Register(r)
 
