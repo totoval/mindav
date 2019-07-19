@@ -16,7 +16,7 @@ MinDAV is a WebDAV server which is supported multi file backends such as minio, 
 
 > Web Distributed Authoring and Versioning (WebDAV) is an extension of the Hypertext Transfer Protocol (HTTP) that allows clients to perform remote Web content authoring operations.   
 
-There're many cloud storages that support webdav protocol, such as **dropbox**, **owncloud**, **nextcloud**, etc.   
+There're many cloud storages that support WebDAV protocol, such as **dropbox**, **owncloud**, **nextcloud**, etc.   
   
 ***WebDAV provides a simple port for your files.***
 
@@ -28,6 +28,14 @@ There're many cloud storages that support webdav protocol, such as **dropbox**, 
 ## Structure
 
 `WebDAVClients <---> MinDAV <---> Minio `
+
+## One Click Start
+```bash
+docker-compose up -d
+```
+Now you can connect the MinDAV by using your favorite WebDAV clients, such as [Cyberduck](http://cyberduck.io):  
+<img src="https://raw.githubusercontent.com/totoval/mindav/master/readme_assets/37E56D20-FCA7-41FB-B8B2-3B5E390A6DBC.png" alt="cyberduck client" width="600" />
+
 
 ## Getting Started
 > Assumed that you already have your [Minio](https://github.com/minio/minio) server running. Or [Quick Run Minio Server](#quick-run-minio-server) 
@@ -46,8 +54,7 @@ There're many cloud storages that support webdav protocol, such as **dropbox**, 
     }
     ```
 * Run `go run main.go` or the run the binary
-* Now you can connect the Mindav by using webdav clients, such as [Cyberduck](http://cyberduck.io):  
-<img src="https://raw.githubusercontent.com/totoval/mindav/master/readme_assets/37E56D20-FCA7-41FB-B8B2-3B5E390A6DBC.png" alt="cyberduck client" width="600" />
+* Now you can connect the MinDAV by using your favorite WebDAV clients
 
 ## Supported Clients(KNOWN):   
 * [Cyberduck](http://cyberduck.io) for `OSX`  
