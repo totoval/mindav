@@ -3,7 +3,7 @@
 ############################
 FROM golang:1.12-stretch AS builder
 COPY . /app/src/
-ENV GOPROXY=https://mirrors.aliyun.com/goproxy/
+#ENV GOPROXY=https://mirrors.aliyun.com/goproxy/
 ENV CGO_ENABLED=0
 ENV GOOS=linux
 ENV GOARCH=amd64
