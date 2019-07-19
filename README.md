@@ -1,4 +1,4 @@
-# Mindav
+# MinDAV
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/totoval/mindav.svg)
 ![GitHub last commit](https://img.shields.io/github/last-commit/totoval/mindav.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/totoval/mindav)](https://goreportcard.com/report/github.com/totoval/mindav)
@@ -6,8 +6,28 @@
 ![GitHub top language](https://img.shields.io/github/languages/top/totoval/mindav.svg)
 ![GitHub](https://img.shields.io/github/license/totoval/mindav.svg)
 
-## About Mindav
-Mindav is a webdav server which is supported multi file backends such as minio, memory and file.
+## About MinDAV
+MinDAV is a WebDAV server which is supported multi file backends such as minio, memory and file.  
+  
+**WebDAV ❤️ Minio**
+
+## Why them?
+### WebDAV
+
+> Web Distributed Authoring and Versioning (WebDAV) is an extension of the Hypertext Transfer Protocol (HTTP) that allows clients to perform remote Web content authoring operations.   
+
+There're many cloud storages that support webdav protocol, such as **dropbox**, **owncloud**, **nextcloud**, etc.   
+  
+***WebDAV provides a simple port for your files.***
+
+### Minio
+> The 100% Open Source, Enterprise-Grade, Amazon S3 Compatible Object Storage  
+  
+***Minio is [reliable](https://docs.min.io/docs/minio-erasure-code-quickstart-guide.html) for your files.***
+
+## Structure
+
+`WebDAVClients <---> MinDAV <---> Minio `
 
 ## Getting Started
 > Assumed that you already have your [Minio](https://github.com/minio/minio) server running. Or [Quick Run Minio Server](#quick-run-minio-server) 
@@ -16,6 +36,8 @@ Mindav is a webdav server which is supported multi file backends such as minio, 
     ```json
     {
       "WEBDAV_DRIVER": "minio",
+      "WEBDAV_USER": "totoval",
+      "WEBDAV_password": "passw0rd",
       "MINIO_ENDPOINT": "play.min.io:9000",
       "MINIO_ACCESS_KEY_ID": "access_key_id",
       "MINIO_SECRET_ACCESS_KEY": "secret_access_key",
@@ -25,7 +47,7 @@ Mindav is a webdav server which is supported multi file backends such as minio, 
     ```
 * Run `go run main.go` or the run the binary
 * Now you can connect the Mindav by using webdav clients, such as [Cyberduck](http://cyberduck.io):  
-<img src="https://raw.githubusercontent.com/totoval/mindav/master/readme_assets/D133AD6B-755F-4878-826F-FC9A6A0BA273.png" alt="cyberduck client" width="300" />
+<img src="https://raw.githubusercontent.com/totoval/mindav/master/readme_assets/37E56D20-FCA7-41FB-B8B2-3B5E390A6DBC.png" alt="cyberduck client" width="600" />
 
 ## Supported Clients(KNOWN):   
 * [Cyberduck](http://cyberduck.io) for `OSX`  
@@ -47,7 +69,7 @@ docker run --name minio --rm -it \
 - [x] Memory filesystem support
 - [x] File filesystem support
 - [x] Minio filesystem support
-- [ ] User system
+- [x] User system
 
 ## Thanks
 * [Totoval](https://github.com/totoval/totoval)

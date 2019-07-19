@@ -28,7 +28,7 @@ func init() {
 	webdav["base_url"] = "/webdav"
 
 	webdav["accounts"] = gin.Accounts{
-		Env("WEBDAV_USER", "username").(string): Env("WEBDAV_PASSWORD", "password").(string),
+		Env("WEBDAV_USER", "totoval").(string): Env("WEBDAV_PASSWORD", "passw0rd").(string),
 	}
 
 	Add("webdav", webdav)
