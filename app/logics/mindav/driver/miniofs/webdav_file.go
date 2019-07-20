@@ -24,7 +24,6 @@ func (mo file) Stat() (os.FileInfo, error) {
 func (mo file) ReadFrom(r io.Reader) (n int64, err error) {
 	n, err = mo.m.client.PutObject(mo.m.bucketName, strings.TrimPrefix(mo.name, "/"), r, -1, minio.PutObjectOptions{ContentType: "application/octet-stream"})
 	if err != nil {
-
 		return 0, log.Error(err, toto.V{"op": "ReadFrom", "name": mo.name})
 	}
 	fmt.Println("Successfully uploaded bytes: ", n)
