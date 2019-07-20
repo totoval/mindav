@@ -39,7 +39,6 @@ docker-compose up -d
 Now you can connect the MinDAV by using your favorite WebDAV clients, such as [Cyberduck](http://cyberduck.io):  
 <img src="https://raw.githubusercontent.com/totoval/mindav/master/readme_assets/37E56D20-FCA7-41FB-B8B2-3B5E390A6DBC.png" alt="cyberduck client" width="600" />
 
-
 ## Getting Started
 > Assumed that you already have your [Minio](https://github.com/minio/minio) server running. Or [Quick Run Minio Server](#quick-run-minio-server) 
 * `cp .env.example.json .env.json`
@@ -59,12 +58,6 @@ Now you can connect the MinDAV by using your favorite WebDAV clients, such as [C
 * Run `go run main.go` or the run the binary
 * Now you can connect the MinDAV by using your favorite WebDAV clients
 
-## Supported Clients(KNOWN):   
-* [Cyberduck](http://cyberduck.io) for `OSX`  
-* [PhotoSync](http://www.photosync-app.com) for `iOS`
-* and More...
-> `OSX`'s `finder` is not support for `rename` operate!
-
 ## Quick Run Minio Server
 ```sh
 docker run --name minio --rm -it \ 
@@ -74,6 +67,12 @@ docker run --name minio --rm -it \
     minio/minio:latest \ 
     server /data
 ```
+
+## Supported Clients(KNOWN):   
+* [Cyberduck](http://cyberduck.io) for `OSX`  
+* [PhotoSync](http://www.photosync-app.com) for `iOS`
+* and More...
+> `OSX`'s `finder` is not support for `rename` operate!
 
 ## Roadmap
 - [x] Memory filesystem support
