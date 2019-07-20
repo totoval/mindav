@@ -32,6 +32,8 @@ There're many cloud storages that support WebDAV protocol, such as **dropbox**, 
 
 ## One Click Start
 ```bash
+git clone git@github.com:totoval/mindav.git
+cd mindav
 docker-compose up -d
 ```
 Now you can connect the MinDAV by using your favorite WebDAV clients, such as [Cyberduck](http://cyberduck.io):  
