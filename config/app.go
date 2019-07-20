@@ -17,8 +17,8 @@ func init() {
 	app["fallback_locale"] = "en"
 	app["key"] = Env("APP_KEY")
 	app["cipher"] = "AES-256-CBC"
-	app["read_timeout_seconds"] = 10
-	app["write_timeout_seconds"] = 10
+	app["read_timeout_seconds"] = 86400
+	app["write_timeout_seconds"] = 86400
 
 	Add("app", app)
 }
