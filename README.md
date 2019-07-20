@@ -5,6 +5,7 @@
 ![Travis (.org)](https://img.shields.io/travis/totoval/mindav.svg)
 ![GitHub top language](https://img.shields.io/github/languages/top/totoval/mindav.svg)
 ![GitHub](https://img.shields.io/github/license/totoval/mindav.svg)
+![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/totoval/mindav.svg)
 
 ## About MinDAV
 MinDAV is a WebDAV server which is supported multi file backends such as minio, memory and file.  
