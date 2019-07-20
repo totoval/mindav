@@ -26,9 +26,9 @@ There're many cloud storages that support WebDAV protocol, such as **dropbox**, 
   
 ***Minio is [reliable](https://docs.min.io/docs/minio-erasure-code-quickstart-guide.html) for your files.***
 
-## Structure
+## Architecture
 
-`WebDAVClients <---> MinDAV <---> Minio `
+<img src="https://raw.githubusercontent.com/totoval/mindav/master/readme_assets/architecture.png" alt="mindav architecture" width="800" />
 
 ## One Click Start
 ```bash
@@ -46,7 +46,7 @@ Now you can connect the MinDAV by using your favorite WebDAV clients, such as [C
     {
       "WEBDAV_DRIVER": "minio",
       "WEBDAV_USER": "totoval",
-      "WEBDAV_password": "passw0rd",
+      "WEBDAV_PASSWORD": "passw0rd",
       "MINIO_ENDPOINT": "play.min.io:9000",
       "MINIO_ACCESS_KEY_ID": "access_key_id",
       "MINIO_SECRET_ACCESS_KEY": "secret_access_key",
