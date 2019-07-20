@@ -69,9 +69,10 @@ docker run --name minio --rm -it \
 ```
 
 ## Supported Clients(KNOWN):   
-* [Cyberduck](http://cyberduck.io) for `OSX`  
-* [PhotoSync](http://www.photosync-app.com) for `iOS`
-* and More...
+* [Cyberduck](http://cyberduck.io) for `OSX`, `Windows`  
+* [PhotoSync](http://www.photosync-app.com) for `iOS`, `Android`  
+* [Filezilla](https://filezilla-project.org/) for `OSX`, `Windows`, `Linux`
+* And More...
 > `OSX`'s `finder` is not support for `rename` operate!
 
 ## Roadmap
