@@ -17,11 +17,11 @@ type file struct {
 	name string
 }
 
-func (mo file) Stat() (os.FileInfo, error) {
+func (mo *file) Stat() (os.FileInfo, error) {
 	log.Trace("file stat", toto.V{"name": mo.name})
 	return mo.m.Stat(context.Background(), mo.name)
 }
-func (mo file) ReadFrom(r io.Reader) (n int64, err error) {
+func (mo *file) ReadFrom(r io.Reader) (n int64, err error) {
 	n, err = mo.m.client.PutObject(mo.m.bucketName, strings.TrimPrefix(mo.name, "/"), r, -1, minio.PutObjectOptions{ContentType: "application/octet-stream"})
 	if err != nil {
 		return 0, log.Error(err, toto.V{"op": "ReadFrom", "name": mo.name})
@@ -29,11 +29,11 @@ func (mo file) ReadFrom(r io.Reader) (n int64, err error) {
 	fmt.Println("Successfully uploaded bytes: ", n)
 	return n, nil
 }
-func (mo file) Write(p []byte) (n int, err error) {
+func (mo *file) Write(p []byte) (n int, err error) {
 	return len(p), nil // useless
 }
 
-func (mo file) Readdir(count int) (fileInfoList []os.FileInfo, err error) {
+func (mo *file) Readdir(count int) (fileInfoList []os.FileInfo, err error) {
 	log.Trace("file readDir", toto.V{"name": mo.name})
 
 	name, err := clearName(mo.name)

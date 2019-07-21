@@ -8,7 +8,7 @@
 ![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/totoval/mindav.svg)
 
 ## About MinDAV
-MinDAV is a WebDAV server which is supported multi file backends such as minio, memory and file.  
+MinDAV is a self-hosted file backup server which bridges WebDAV protocol with Minio.  
   
 **WebDAV ❤️ Minio**
 

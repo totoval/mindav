@@ -28,6 +28,7 @@ type minioFileSystem struct {
 	bucketName      string
 	location        string
 	rootInfo        *fileInfo
+	rootFile *file
 }
 
 func New(bucketName string, location string) *minioFileSystem {
@@ -47,6 +48,7 @@ func New(bucketName string, location string) *minioFileSystem {
 			StorageClass: "",
 		}},
 	}
+	m.rootFile = &file{m, nil, "/"}
 
 	var err error
 	if m.client, err = minio.New(m.Endpoint, m.AccessKeyID, m.SecretAccessKey, m.UseSSL); err != nil {
@@ -118,7 +120,7 @@ func (m *minioFileSystem) OpenFile(ctx context.Context, name string, flag int, p
 	log.Trace("minio openfile", toto.V{"Name": name})
 
 	if len(name) == 0 {
-		return file{m, nil, "/"}, nil
+		return m.rootFile, nil
 	}
 
 	// file
@@ -128,7 +130,7 @@ func (m *minioFileSystem) OpenFile(ctx context.Context, name string, flag int, p
 		return nil, err
 	}
 
-	return file{m, object, name}, nil
+	return &file{m, object, name}, nil
 }
 func (m *minioFileSystem) RemoveAll(ctx context.Context, name string) error {
 
@@ -158,8 +160,11 @@ func (m *minioFileSystem) RemoveAll(ctx context.Context, name string) error {
 		if rErr.Err != nil {
 			return rErr.Err
 		}
+
+		deleteCacheIsDir(rErr.ObjectName)
 	}
 
+	deleteCacheIsDir(name)
 	return m.client.RemoveObject(m.bucketName, name)
 }
 func (m *minioFileSystem) Rename(ctx context.Context, oldName, newName string) error {
@@ -272,11 +277,10 @@ func (m *minioFileSystem) isDir(name string) bool {
 		name = name + "/"
 	}
 
-	//@todo cache result
-	const CACHE_KEY_ISDIR = "mindav_isdir_%s"
-	cacheKey := fmt.Sprintf(CACHE_KEY_ISDIR, name)
-	if cache.Has(cacheKey){
-		return cache.Get(cacheKey).(bool)
+	// cache result
+	isDirPtr := getCacheIsDir(name)
+	if isDirPtr != nil{
+		return *isDirPtr
 	}
 
 	childrenCount := 0
@@ -297,16 +301,31 @@ func (m *minioFileSystem) isDir(name string) bool {
 		_, err := m.client.StatObject(m.bucketName, path.Join(name, KEEP_FILE_NAME), minio.StatObjectOptions{})
 		if err != nil {
 			// not dir or not exist
-			cache.Forever(cacheKey, false)
-			return false
+			return cacheIsDir(name, false)
 		}
 
 		// empty dir
-		cache.Forever(cacheKey, true)
-		return true
+		return cacheIsDir(name, true)
 	} else {
 		// not empty dir
-		cache.Forever(cacheKey, true)
-		return true
+		return cacheIsDir(name, true)
 	}
+}
+func cacheIsDir(name string, isDir bool) (_isDir bool){
+	cache.Forever(isDirCacheKey(name), isDir)
+	return isDir
+}
+func getCacheIsDir(name string) (isDirPtr *bool){
+	if cache.Has(isDirCacheKey(name)){
+		isDir := cache.Get(isDirCacheKey(name)).(bool)
+		return &isDir
+	}
+	return nil
+}
+func deleteCacheIsDir(name string){
+	cache.Forget(isDirCacheKey(name))
+}
+func isDirCacheKey(name string) string {
+	const CACHE_KEY_ISDIR = "mindav_isdir_%s"
+	return fmt.Sprintf(CACHE_KEY_ISDIR, name)
 }
