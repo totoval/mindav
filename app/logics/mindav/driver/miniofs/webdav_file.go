@@ -65,7 +65,7 @@ func (mo file) Readdir(count int) (fileInfoList []os.FileInfo, err error) {
 			object.ContentType = "inode/directory"
 		}
 
-		fileInfoList = append(fileInfoList, fileInfo{object})
+		fileInfoList = append(fileInfoList, &fileInfo{object})
 	}
 
 	return fileInfoList, err

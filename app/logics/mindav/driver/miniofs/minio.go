@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/minio/minio-go/v6"
 	"github.com/totoval/framework/config"
+	"github.com/totoval/framework/helpers/cache"
 	"github.com/totoval/framework/helpers/log"
 	"github.com/totoval/framework/helpers/toto"
 	"github.com/totoval/framework/helpers/zone"
@@ -121,7 +122,7 @@ func (m *minioFileSystem) OpenFile(ctx context.Context, name string, flag int, p
 	}
 
 	// file
-	object, err := m.client.GetObject(m.bucketName, strings.TrimPrefix(name, "/"), minio.GetObjectOptions{})
+	object, err := m.client.GetObjectWithContext(ctx, m.bucketName, strings.TrimPrefix(name, "/"), minio.GetObjectOptions{})
 	log.Trace("open file", toto.V{"name": name})
 	if err != nil {
 		return nil, err
@@ -211,7 +212,7 @@ func (m *minioFileSystem) Stat(ctx context.Context, name string) (os.FileInfo, e
 				if err != nil {
 					return nil, err
 				}
-				return fileInfo{minio.ObjectInfo{
+				return &fileInfo{minio.ObjectInfo{
 					Key:          theName,
 					Size:         0,
 					LastModified: zone.Now(),
@@ -223,7 +224,7 @@ func (m *minioFileSystem) Stat(ctx context.Context, name string) (os.FileInfo, e
 		}
 		return nil, log.Error(err)
 	}
-	return fileInfo{stat}, nil
+	return &fileInfo{stat}, nil
 }
 func (m *minioFileSystem) walkDir(ctx context.Context, oldParentName, newParentName, oldName string) error {
 
@@ -272,7 +273,11 @@ func (m *minioFileSystem) isDir(name string) bool {
 	}
 
 	//@todo cache result
-	//cache.Put()
+	const CACHE_KEY_ISDIR = "mindav_isdir_%s"
+	cacheKey := fmt.Sprintf(CACHE_KEY_ISDIR, name)
+	if cache.Has(cacheKey){
+		return cache.Get(cacheKey).(bool)
+	}
 
 	childrenCount := 0
 	for obj := range m.client.ListObjectsV2(m.bucketName, name, false, nil) {
@@ -292,13 +297,16 @@ func (m *minioFileSystem) isDir(name string) bool {
 		_, err := m.client.StatObject(m.bucketName, path.Join(name, KEEP_FILE_NAME), minio.StatObjectOptions{})
 		if err != nil {
 			// not dir or not exist
+			cache.Forever(cacheKey, false)
 			return false
 		}
 
 		// empty dir
+		cache.Forever(cacheKey, true)
 		return true
 	} else {
 		// not empty dir
+		cache.Forever(cacheKey, true)
 		return true
 	}
 }
