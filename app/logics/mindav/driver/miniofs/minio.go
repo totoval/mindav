@@ -28,7 +28,8 @@ type minioFileSystem struct {
 	bucketName      string
 	location        string
 	rootInfo        *fileInfo
-	rootFile *file
+	rootFile        *file
+	uploadTmpPath   string
 }
 
 func New(bucketName string, location string) *minioFileSystem {
@@ -39,6 +40,7 @@ func New(bucketName string, location string) *minioFileSystem {
 		UseSSL:          config.GetBool("webdav.filesystems.minio.use_ssl"),
 		bucketName:      bucketName,
 		location:        location,
+		uploadTmpPath:   ".",
 		rootInfo: &fileInfo{minio.ObjectInfo{
 			Key:          "/",
 			Size:         0,
@@ -279,7 +281,7 @@ func (m *minioFileSystem) isDir(name string) bool {
 
 	// cache result
 	isDirPtr := getCacheIsDir(name)
-	if isDirPtr != nil{
+	if isDirPtr != nil {
 		return *isDirPtr
 	}
 
@@ -311,18 +313,18 @@ func (m *minioFileSystem) isDir(name string) bool {
 		return cacheIsDir(name, true)
 	}
 }
-func cacheIsDir(name string, isDir bool) (_isDir bool){
+func cacheIsDir(name string, isDir bool) (_isDir bool) {
 	cache.Forever(isDirCacheKey(name), isDir)
 	return isDir
 }
-func getCacheIsDir(name string) (isDirPtr *bool){
-	if cache.Has(isDirCacheKey(name)){
+func getCacheIsDir(name string) (isDirPtr *bool) {
+	if cache.Has(isDirCacheKey(name)) {
 		isDir := cache.Get(isDirCacheKey(name)).(bool)
 		return &isDir
 	}
 	return nil
 }
-func deleteCacheIsDir(name string){
+func deleteCacheIsDir(name string) {
 	cache.Forget(isDirCacheKey(name))
 }
 func isDirCacheKey(name string) string {

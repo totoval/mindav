@@ -52,7 +52,8 @@ Now you can connect the MinDAV by using your favorite WebDAV clients, such as [C
       "MINIO_ACCESS_KEY_ID": "access_key_id",
       "MINIO_SECRET_ACCESS_KEY": "secret_access_key",
       "MINIO_BUCKET": "bucket_name",
-      "MINIO_USE_SSL": false
+      "MINIO_USE_SSL": false,
+      "MEMORY_UPLOAD_MODE": false
     }
     ```
 * Run `go run main.go` or the run the binary
@@ -74,6 +75,9 @@ docker run --name minio --rm -it \
 * [Filezilla](https://filezilla-project.org/) for `OSX`, `Windows`, `Linux`
 * And More...
 > `OSX`'s `finder` is not support for `rename` operate!
+
+## MEMORY_UPLOAD_MODE
+> If the host has a large memory, then set to `true` could improve upload performance.
 
 ## Roadmap
 - [x] Memory filesystem support
