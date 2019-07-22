@@ -74,6 +74,7 @@ docker run --name minio --rm -it \
 * [PhotoSync](http://www.photosync-app.com) for `iOS`, `Android`  
 * [FE File Explorer](http://www.skyjos.com) for `iOS`, `Android`, `macOS`  
 * [Filezilla](https://filezilla-project.org/) for `macOS`, `Windows`, `Linux`
+* [rclone](https://rclone.org/webdav/) for `macOS`, `Windows`, `Linux`  
 * And More...
 > `OSX`'s `finder` is not support for `rename` operate!
 
