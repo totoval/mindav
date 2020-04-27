@@ -62,11 +62,11 @@ Now you can connect the MinDAV by using your favorite WebDAV clients, such as [C
 
 ## Quick Run Minio Server
 ```sh
-docker run --name minio --rm -it \ 
-    -p "9000:9000" \ 
-    -v "./minio/data:/data" \ 
-    -v "./minio/config:/root/.minio" \ 
-    minio/minio:latest \ 
+docker run --name minio --rm -it \
+    -p "9000:9000" \
+    -v "./minio/data:/data" \
+    -v "./minio/config:/root/.minio" \
+    minio/minio:latest \
     server /data
 ```
 
